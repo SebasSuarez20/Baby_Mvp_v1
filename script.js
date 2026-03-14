@@ -1,0 +1,261 @@
+// ============================================================================
+// VARIABLES GLOBALES
+// ============================================================================
+let entries = [];
+const REFRESH_INTERVAL = 3000; // Actualizar cada 3 segundos
+
+// ============================================================================
+// FUNCIÓN DE NOTIFICACIONES
+// ============================================================================
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    toastMessage.textContent = message;
+    
+    // Mapeo de tipos
+    const typeMap = {
+        'success': 'bg-success',
+        'error': 'bg-danger',
+        'danger': 'bg-danger',
+        'info': 'bg-info'
+    };
+    
+    toast.className = `toast align-items-center text-white ${typeMap[type] || 'bg-info'} border-0`;
+    const bsToast = new bootstrap.Toast(toast);
+    bsToast.show();
+}
+
+// ============================================================================
+// CARGAR ENTRADAS DESDE EL BACKEND
+// ============================================================================
+async function loadEntries() {
+    try {
+        const response = await fetch('/api/entries');
+        if (!response.ok) throw new Error('Error al cargar entradas');
+        
+        entries = await response.json();
+        renderGallery();
+        updateStats();
+    } catch (error) {
+        console.error('Error cargando entradas:', error);
+    }
+}
+
+// ============================================================================
+// MANEJAR ENVÍO DEL FORMULARIO
+// ============================================================================
+async function handleSubmit(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById('name').value.trim();
+    const team = document.querySelector('input[name="team"]:checked')?.value;
+    const fileInput = document.getElementById('file');
+    const file = fileInput.files[0];
+
+    // Validación
+    if (!name) {
+        showToast('Por favor, escribe tu nombre.', 'error');
+        return;
+    }
+
+    if (!team) {
+        showToast('Por favor, elige tu equipo.', 'error');
+        return;
+    }
+
+    // Subir archivo si existe
+    let fileUrl = '';
+    if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) throw new Error('Error al subir archivo');
+            
+            const data = await response.json();
+            fileUrl = data.url;
+        } catch (error) {
+            showToast('❌ Error al subir el archivo. Intenta de nuevo.', 'error');
+            console.error('Error al subir:', error);
+            return;
+        }
+    }
+
+    // Enviar participación
+    try {
+        const response = await fetch('/api/entries', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, team, fileUrl })
+        });
+        
+        if (!response.ok) throw new Error('Error al enviar participación');
+        
+        showToast(`¡${name}, tu participación fue enviada! 🎉`, 'success');
+        document.getElementById('participationForm').reset();
+        document.getElementById('filePreview').classList.add('d-none');
+        
+        // Recargar entradas
+        await loadEntries();
+    } catch (error) {
+        showToast('Error de conexión. Intenta de nuevo.', 'error');
+        console.error('Error al enviar:', error);
+    }
+}
+
+// ============================================================================
+// RENDERIZAR GALERÍA
+// ============================================================================
+function renderGallery() {
+    const container = document.getElementById('galleryContainer');
+    
+    if (entries.length === 0) {
+        container.innerHTML = '<div class="col-12 text-center py-5"><p class="text-muted fs-5">Sin participantes aún. ¡Sé el primero! 🎉</p></div>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    entries.forEach((entry, index) => {
+        const col = document.createElement('div');
+        col.className = 'col-lg-4 col-md-6 fade-in';
+
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+
+        let mediaHtml = '';
+        if (entry.fileUrl) {
+            if (entry.fileUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                mediaHtml = `<img src="${entry.fileUrl}" alt="Participación de ${entry.name}" class="gallery-img" onerror="this.src='https://via.placeholder.com/400x300?text=Foto+no+disponible'">`;
+            } else if (entry.fileUrl.match(/\.(mp4|webm|ogg|avi)$/i)) {
+                mediaHtml = `<video controls class="gallery-img"><source src="${entry.fileUrl}" type="video/mp4">Tu navegador no soporta video</video>`;
+            } else {
+                mediaHtml = `<div class="gallery-img d-flex align-items-center justify-content-center bg-light"><span class="text-muted">📁 Archivo</span></div>`;
+            }
+        } else {
+            mediaHtml = `<div class="gallery-img d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #e0e7ff 0%, #fce7f3 100%);"><span class="text-muted">🎉</span></div>`;
+        }
+
+        const teamBadge = entry.team === 'blue' 
+            ? '<span class="gallery-team bg-primary">💙 Azul</span>'
+            : '<span class="gallery-team bg-danger">🩷 Rosa</span>';
+
+        item.innerHTML = `
+            ${mediaHtml}
+            <div class="gallery-content">
+                <div class="gallery-name">👤 ${entry.name}</div>
+                ${teamBadge}
+            </div>
+        `;
+
+        col.appendChild(item);
+        container.appendChild(col);
+    });
+}
+
+// ============================================================================
+// ACTUALIZAR ESTADÍSTICAS
+// ============================================================================
+function updateStats() {
+    const blueEntries = entries.filter(e => e.team === 'blue');
+    const pinkEntries = entries.filter(e => e.team === 'pink');
+    const totalCount = entries.length;
+
+    const blueCount = blueEntries.length;
+    const pinkCount = pinkEntries.length;
+
+    // Actualizar números
+    document.getElementById('blueVotes').textContent = blueCount;
+    document.getElementById('pinkVotes').textContent = pinkCount;
+    document.getElementById('blueCount').textContent = blueCount;
+    document.getElementById('pinkCount').textContent = pinkCount;
+
+    // Actualizar barras de progreso
+    const bluePercent = totalCount > 0 ? (blueCount / totalCount) * 100 : 0;
+    const pinkPercent = totalCount > 0 ? (pinkCount / totalCount) * 100 : 0;
+
+    const blueBar = document.getElementById('blueProgressBar');
+    const pinkBar = document.getElementById('pinkProgressBar');
+
+    if (blueBar) blueBar.style.width = bluePercent + '%';
+    if (pinkBar) pinkBar.style.width = pinkPercent + '%';
+}
+
+// ============================================================================
+// PREVIEW DE ARCHIVOS
+// ============================================================================
+document.addEventListener('DOMContentLoaded', () => {
+    // Event listeners para el formulario
+    const participationForm = document.getElementById('participationForm');
+    if (participationForm) {
+        participationForm.addEventListener('submit', handleSubmit);
+    }
+
+    // Event listener para el input de archivo
+    const fileInput = document.getElementById('file');
+    if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            const preview = document.getElementById('filePreview');
+
+            if (file) {
+                preview.classList.remove('d-none');
+                
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        preview.innerHTML = `<img src="${event.target.result}" alt="Preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                } else if (file.type.startsWith('video/')) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        preview.innerHTML = `<video controls style="max-width: 100%;"><source src="${event.target.result}" type="${file.type}"></video>`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.innerHTML = `<p class="text-center text-muted">📁 Archivo: ${file.name}</p>`;
+                }
+            } else {
+                preview.classList.add('d-none');
+                preview.innerHTML = '';
+            }
+        });
+    }
+
+    // Drag and drop para archivo
+    const fileUploadArea = document.querySelector('.file-upload-area');
+    if (fileUploadArea) {
+        fileUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = 'var(--primary-blue)';
+            fileUploadArea.style.background = 'rgba(59, 130, 246, 0.1)';
+        });
+
+        fileUploadArea.addEventListener('dragleave', () => {
+            fileUploadArea.style.borderColor = '#cbd5e1';
+            fileUploadArea.style.background = '';
+        });
+
+        fileUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileUploadArea.style.borderColor = '#cbd5e1';
+            fileUploadArea.style.background = '';
+            
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+
+    // Cargar entradas iniciales
+    loadEntries();
+
+    // Actualizar entradas periódicamente
+    setInterval(loadEntries, REFRESH_INTERVAL);
+});

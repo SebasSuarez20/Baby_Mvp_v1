@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Revelación de Género! - Adrián & Francy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid p-0">
+        <!-- Hero Section -->
+        <header class="hero-section text-center py-5">
+            <div class="hero-content">
+                <div class="floating-elements">
+                    <div class="floating-heart">💖</div>
+                    <div class="floating-star">⭐</div>
+                    <div class="floating-balloon">🎈</div>
+                    <div class="floating-heart">💕</div>
+                    <div class="floating-star">✨</div>
+                    <div class="floating-gift">🎁</div>
+                    <div class="floating-baby">👶</div>
+                </div>
+                
+                <div class="hero-images-container">
+                    <img src="https://images.pexels.com/photos/1612803/pexels-photo-1612803.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Bebé lindo" class="hero-baby-img hero-baby-1">
+                    <img src="https://images.pexels.com/photos/1257110/pexels-photo-1257110.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Bebé sonriendo" class="hero-baby-img hero-baby-2">
+                    <img src="https://images.pexels.com/photos/377058/pexels-photo-377058.jpeg?auto=compress&cs=tinysrgb&w=400" alt="Bebé adorable" class="hero-baby-img hero-baby-3">
+                </div>
+                
+                <div class="hero-text-wrapper">
+                    <h1 class="hero-title">🎉 ¡REVELACIÓN DE GÉNERO! 🎉</h1>
+                    <p class="hero-subtitle">Adrián & Francy</p>
+                    
+                    <div class="message-boxes">
+                        <div class="message-box">
+                            <p class="mb-0">Para nosotros es muy importante compartir con todos ustedes este momento tan especial y anhelado.</p>
+                        </div>
+                        <div class="message-box">
+                            <p class="mb-0">Queremos que sean parte y vivan el <strong>Proceso de felicidad</strong> 💝</p>
+                        </div>
+                    </div>
+                    
+                    <div class="theme-explanation">
+                        <h3 class="theme-title">✨ La Temática ✨</h3>
+                        <p class="theme-text">
+                            Cada uno de ustedes nos debe dejar reflejado por medio de una <strong>foto o vídeo</strong> el 
+                            <span class="text-blue">💙 SEXO 🩷</span> que ustedes consideren que está por llegar.
+                        </p>
+                        <p class="theme-text mb-0">
+                            Usa cualquier elemento simbólico de <strong>color rosa o azul</strong>: suéteres, vestidos, blusas, 10, zapatos, accesorios o cualquier elemento. <strong>¡Deja volar tu imaginación!</strong>
+                        </p>
+                    </div>
+                    
+                    <div class="voting-info-box">
+                        <h4 class="mb-3">📊 Cómo Funciona</h4>
+                        <div class="row g-2 text-center">
+                            <div class="col-md-4">
+                                <div class="step-badge">
+                                    <div class="step-number">1</div>
+                                    <p class="mb-0">Elige tu equipo</p>
+                                    <small>Azul 💙 o Rosa 🩷</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="step-badge">
+                                    <div class="step-number">2</div>
+                                    <p class="mb-0">Sube tu foto/video</p>
+                                    <small>Mostrando tu color</small>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="step-badge">
+                                    <div class="step-number">3</div>
+                                    <p class="mb-0">¡Gana con tu equipo!</p>
+                                    <small>🏆 Equipo ganador 🏅</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="teams-display">
+                    <div class="team-badge blue-team animate-bounce">
+                        <i class="fas fa-mars"></i>
+                        <span>Equipo Azul</span>
+                        <span class="team-count"><span id="blueCount">0</span></span>
+                    </div>
+                    <div class="team-badge pink-team animate-bounce">
+                        <i class="fas fa-venus"></i>
+                        <span>Equipo Rosa</span>
+                        <span class="team-count"><span id="pinkCount">0</span></span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Formulario de Participación -->
+        <section class="participation-section py-5">
+            <div class="container">
+                <h2 class="section-title text-center mb-5">
+                    <i class="fas fa-star me-2"></i>
+                    Participa ahora en la Revelación
+                    <i class="fas fa-star ms-2"></i>
+                </h2>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="glass-card p-5">
+                            <form id="participationForm">
+                                <div class="mb-4">
+                                    <label for="name" class="form-label fw-semibold">Tu Nombre</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <input type="text" class="form-control" id="name" placeholder="Escribe tu nombre" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Elige tu Equipo</label>
+                                    <div class="team-choice-container">
+                                        <div class="team-choice">
+                                            <input class="form-check-input team-radio" type="radio" name="team" id="blue" value="blue" required>
+                                            <label class="form-check-label w-100" for="blue">
+                                                <i class="fas fa-mars"></i>
+                                                <strong>Equipo Azul</strong>
+                                                <small>Creemos que es un Niño</small>
+                                            </label>
+                                        </div>
+                                        <div class="team-choice">
+                                            <input class="form-check-input team-radio" type="radio" name="team" id="pink" value="pink" required>
+                                            <label class="form-check-label w-100" for="pink">
+                                                <i class="fas fa-venus"></i>
+                                                <strong>Equipo Rosa</strong>
+                                                <small>Creemos que es una Niña</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <label for="file" class="form-label fw-semibold">Sube tu Foto/Video con tu Color 📸</label>
+                                    <div class="file-upload-area">
+                                        <input type="file" class="form-control d-none" id="file" accept="image/*,video/*">
+                                        <label for="file" class="file-upload-label">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <p class="mb-1">Haz clic o arrastra tu archivo aquí</p>
+                                            <small>Imágenes o videos (JPG, PNG, MP4, etc.)</small>
+                                        </label>
+                                        <div id="filePreview" class="file-preview d-none"></div>
+                                    </div>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-lg w-100 fw-bold">
+                                    <i class="fas fa-paper-plane me-2"></i>¡ENVIAR MI PARTICIPACIÓN!
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="toast" class="toast" role="alert">
+            <div class="toast-body" id="toastMessage"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
