@@ -44,9 +44,9 @@ async function loadEntries() {
 // ============================================================================
 // MANEJAR ENVÍO DEL FORMULARIO
 // ============================================================================
-async function handleSubmit(event) {
+async function handleSubmit(event) {    
+    showToast('Un momento por favor se esta registrando el video.', 'success');
     event.preventDefault();
-    
     const name = document.getElementById('name').value.trim();
     const team = document.querySelector('input[name="team"]:checked')?.value;
     const fileInput = document.getElementById('file');
@@ -66,11 +66,13 @@ async function handleSubmit(event) {
     // Subir archivo si existe
     let fileUrl = '';
     if (file) {
+  
         const formData = new FormData();
         formData.append('file', file);
         formData.append('name', name);
         formData.append('team', team);
         try {
+            
             const response = await fetch('/api/upload', {
                 method: 'POST',
                 body: formData
@@ -80,32 +82,12 @@ async function handleSubmit(event) {
             
             const data = await response.json();
             fileUrl = data.url;
+               showToast('Registro correctamente el video.', 'success');
         } catch (error) {
             showToast('❌ Error al subir el archivo. Intenta de nuevo.', 'error');
             console.error('Error al subir:', error);
             return;
         }
-    }
-
-    // Enviar participación
-    try {
-        const response = await fetch('/api/entries', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, team, fileUrl })
-        });
-        
-        if (!response.ok) throw new Error('Error al enviar participación');
-        
-        showToast(`¡${name}, tu participación fue enviada! 🎉`, 'success');
-        document.getElementById('participationForm').reset();
-        document.getElementById('filePreview').classList.add('d-none');
-        
-        // Recargar entradas
-        await loadEntries();
-    } catch (error) {
-        showToast('Error de conexión. Intenta de nuevo.', 'error');
-        console.error('Error al enviar:', error);
     }
 }
 
@@ -257,7 +239,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar entradas iniciales
     loadEntries();
-
-    // Actualizar entradas periódicamente
-    setInterval(loadEntries, REFRESH_INTERVAL);
 });

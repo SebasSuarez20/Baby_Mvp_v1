@@ -4,8 +4,7 @@ import AWS from 'aws-sdk';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import dotenv from "dotenv";
-dotenv.config();
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -45,11 +44,10 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     const key = `${team}/${fileName}`;
 
     const params = {
-      Bucket: process.env.S3_BUCKET_NAME,
+      Bucket: 's3babydev',
       Key: key,
       Body: req.file.buffer,
-      ContentType: req.file.mimetype,
-      ACL: "public-read"
+      ContentType: req.file.mimetype
     };
 
     const data = await s3.upload(params).promise();
@@ -59,6 +57,7 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
       key: key
     });
 
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -67,14 +66,6 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
 
 // API para obtener entradas
 let entries = [];
-app.get('/api/entries', (req, res) => res.json(entries));
-app.post('/api/entries', (req, res) => {
-  const { name, team, fileUrl } = req.body;
-  if (!name || !team) return res.status(400).json({ error: 'Missing fields' });
-  const entry = { name, team, fileUrl, timestamp: new Date().toISOString() };
-  entries.push(entry);
-  res.status(200).json(entry);
-});
 
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 
