@@ -68,6 +68,8 @@ async function handleSubmit(event) {
     if (file) {
         const formData = new FormData();
         formData.append('file', file);
+        formData.append('name', name);
+        formData.append('team', team);
         try {
             const response = await fetch('/api/upload', {
                 method: 'POST',

@@ -24,20 +24,42 @@ const s3 = new AWS.S3();
 const upload = multer({ storage: multer.memoryStorage() });
 
 // API para subir archivos a S3
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+app.post('/api/upload', upload.single('file'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
 
-  const params = {
-    Bucket: process.env.S3_BUCKET_NAME || 'tu-bucket-s3',
-    Key: `uploads/${Date.now()}-${req.file.originalname}`,
-    Body: req.file.buffer,
-    ACL: 'public-read'
-  };
+    const team = req.body.team || "otros";
+    const name = req.body.name || "anonimo";
 
-  s3.upload(params, (err, data) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ url: data.Location });
-  });
+    const safeName = name.replace(/[^a-zA-Z0-9]/g, "_");
+
+    const ext = req.file.originalname.split('.').pop();
+
+    const fileName = `${safeName}_${Date.now()}.${ext}`;
+
+    const key = `${team}/${fileName}`;
+
+    const params = {
+      Bucket: process.env.S3_BUCKET_NAME,
+      Key: key,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype,
+      ACL: "public-read"
+    };
+
+    const data = await s3.upload(params).promise();
+
+    res.json({
+      url: data.Location,
+      key: key
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // API para obtener entradas
