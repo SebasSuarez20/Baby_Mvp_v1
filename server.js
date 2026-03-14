@@ -54,7 +54,7 @@ app.post('/api/entries', (req, res) => {
 const DEFAULT_PORT = parseInt(process.env.PORT, 10) || 3000;
 
 function startServer(port = DEFAULT_PORT, maxTries = 5) {
-  const server = app.listen(port, () => {
+  const server = app.listen(port,"0.0.0.0", () => {
     console.log(`Servidor local en http://localhost:${port}`);
   });
 
