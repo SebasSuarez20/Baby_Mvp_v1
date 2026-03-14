@@ -4,6 +4,8 @@ import AWS from 'aws-sdk';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from "dotenv";
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,10 +17,9 @@ app.use(express.static(path.join(__dirname)));
 
 // Configura AWS S3 (agrega tus credenciales para probar uploads)
 AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'TU_ACCESS_KEY',
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'TU_SECRET_KEY',
   region: 'us-east-1'
 });
+
 const s3 = new AWS.S3();
 
 const upload = multer({ storage: multer.memoryStorage(),limits: {
