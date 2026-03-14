@@ -1,4 +1,6 @@
 {
+  "version": 2,
+  "public": true,
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "env": {
@@ -6,10 +8,20 @@
     "AWS_SECRET_ACCESS_KEY": "@aws_secret_access_key",
     "S3_BUCKET_NAME": "@s3_bucket_name"
   },
-  "rewrites": [
+  "functions": {
+    "server.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "routes": [
     {
-      "source": "/((?!api).*)",
-      "destination": "/"
+      "src": "/api/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html",
+      "status": 200
     }
   ]
 }
