@@ -21,7 +21,9 @@ AWS.config.update({
 });
 const s3 = new AWS.S3();
 
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage(),limits: {
+    fileSize: 100 * 1024 * 1024
+  } });
 
 // API para subir archivos a S3
 app.post('/api/upload', upload.single('file'), async (req, res) => {
