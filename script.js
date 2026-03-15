@@ -106,7 +106,7 @@ async function handleSubmit(event) {
 
         setTimeout(() => {
             location.reload();
-        }, 1500);
+        }, 2500);
 
     } catch (err) {
 
