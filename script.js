@@ -99,9 +99,6 @@ async function handleSubmit(event) {
 
         if (!response.ok) throw new Error();
 
-        // cerrar toast manual
-        loadingToast.hide();
-
         showToast('Archivo subido correctamente', 'success');
 
         setTimeout(() => {
