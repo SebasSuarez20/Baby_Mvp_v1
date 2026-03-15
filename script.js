@@ -45,49 +45,84 @@ async function loadEntries() {
 // MANEJAR ENVÍO DEL FORMULARIO
 // ============================================================================
 async function handleSubmit(event) {    
-    showToast('Un momento por favor se esta registrando el video.', 'success');
     event.preventDefault();
+
     const name = document.getElementById('name').value.trim();
     const team = document.querySelector('input[name="team"]:checked')?.value;
     const fileInput = document.getElementById('file');
     const file = fileInput.files[0];
 
-    // Validación
+    // =============================
+    // VALIDACIONES
+    // =============================
+
     if (!name) {
-        showToast('Por favor, escribe tu nombre.', 'error');
+        showToast('⚠️ Por favor escribe tu nombre', 'error');
         return;
     }
 
     if (!team) {
-        showToast('Por favor, elige tu equipo.', 'error');
+        showToast('⚠️ Debes elegir tu equipo', 'error');
         return;
     }
 
-    // Subir archivo si existe
-    let fileUrl = '';
-    if (file) {
-  
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('name', name);
-        formData.append('team', team);
-        try {
-            
-            const response = await fetch('/api/upload', {
-                method: 'POST',
-                body: formData
-            });
-            
-            if (!response.ok) throw new Error('Error al subir archivo');
-            
-            const data = await response.json();
-            fileUrl = data.url;
-               showToast('Registro correctamente el video.', 'success');
-        } catch (error) {
-            showToast('❌ Error al subir el archivo. Intenta de nuevo.', 'error');
-            console.error('Error al subir:', error);
-            return;
+    if (!file) {
+        showToast('⚠️ Debes subir una foto o video', 'error');
+        return;
+    }
+
+    // =============================
+    // MENSAJE SUBIENDO
+    // =============================
+
+    showToast('⏳ Se está subiendo el archivo, espera...', 'info');
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('name', name);
+    formData.append('team', team);
+
+    try {
+
+        const response = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al subir');
         }
+
+        const data = await response.json();
+
+        // =============================
+        // MENSAJE OK
+        // =============================
+
+        showToast('✅ Archivo subido correctamente', 'success');
+
+        // =============================
+        // REINICIAR FORM
+        // =============================
+
+        document.getElementById('participationForm').reset();
+
+        document.getElementById('filePreview').innerHTML = '';
+        document.getElementById('filePreview').classList.add('d-none');
+
+        // =============================
+        // RECARGAR PAGINA
+        // =============================
+
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+
+    } catch (error) {
+
+        console.error(error);
+
+        showToast('❌ Error al subir el archivo', 'error');
     }
 }
 
