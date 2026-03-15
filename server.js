@@ -21,6 +21,14 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 
+AWS.config.getCredentials(function(err) {
+  if (err) {
+    console.log("ERROR CREDENTIALS:", err);
+  } else {
+    console.log("ACCESS KEY:", AWS.config.credentials.accessKeyId);
+  }
+});
+
 const upload = multer({ storage: multer.memoryStorage(),limits: {
     fileSize: 100 * 1024 * 1024
   } });
