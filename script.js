@@ -7,24 +7,32 @@ const REFRESH_INTERVAL = 3000; // Actualizar cada 3 segundos
 // ============================================================================
 // FUNCIÓN DE NOTIFICACIONES
 // ============================================================================
-function showToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
-    toastMessage.textContent = message;
-    
-    // Mapeo de tipos
-    const typeMap = {
-        'success': 'bg-success',
-        'error': 'bg-danger',
-        'danger': 'bg-danger',
-        'info': 'bg-info'
-    };
-    
-    toast.className = `toast align-items-center text-white ${typeMap[type] || 'bg-info'} border-0`;
-    const bsToast = new bootstrap.Toast(toast);
-    bsToast.show();
-}
+function showToast(message, type = 'info', autoHide = true) {
 
+    const toastEl = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+
+    toastMessage.textContent = message;
+
+    const typeMap = {
+        success: 'bg-success',
+        error: 'bg-danger',
+        danger: 'bg-danger',
+        info: 'bg-info'
+    };
+
+    toastEl.className =
+        `toast align-items-center text-white ${typeMap[type] || 'bg-info'} border-0`;
+
+    const toast = new bootstrap.Toast(toastEl, {
+        autohide: autoHide,
+        delay: 2000
+    });
+
+    toast.show();
+
+    return toast; // 👈 IMPORTANTE
+}
 // ============================================================================
 // CARGAR ENTRADAS DESDE EL BACKEND
 // ============================================================================
@@ -44,7 +52,8 @@ async function loadEntries() {
 // ============================================================================
 // MANEJAR ENVÍO DEL FORMULARIO
 // ============================================================================
-async function handleSubmit(event) {    
+async function handleSubmit(event) {
+
     event.preventDefault();
 
     const name = document.getElementById('name').value.trim();
@@ -52,30 +61,29 @@ async function handleSubmit(event) {
     const fileInput = document.getElementById('file');
     const file = fileInput.files[0];
 
-    // =============================
     // VALIDACIONES
-    // =============================
 
     if (!name) {
-        showToast('⚠️ Por favor escribe tu nombre', 'error');
+        showToast('Escribe tu nombre', 'error');
         return;
     }
 
     if (!team) {
-        showToast('⚠️ Debes elegir tu equipo', 'error');
+        showToast('Elige tu equipo', 'error');
         return;
     }
 
     if (!file) {
-        showToast('⚠️ Debes subir una foto o video', 'error');
+        showToast('Debes subir foto o video', 'error');
         return;
     }
 
-    // =============================
-    // MENSAJE SUBIENDO
-    // =============================
-
-    showToast('⏳ Se está subiendo el archivo, espera...', 'info');
+    // Toast sin autohide
+    const loadingToast = showToast(
+        'Subiendo archivo... espera',
+        'info',
+        false // 👈 NO se cierra solo
+    );
 
     const formData = new FormData();
     formData.append('file', file);
@@ -89,40 +97,24 @@ async function handleSubmit(event) {
             body: formData
         });
 
-        if (!response.ok) {
-            throw new Error('Error al subir');
-        }
+        if (!response.ok) throw new Error();
 
-        const data = await response.json();
+        // cerrar toast manual
+        loadingToast.hide();
 
-        // =============================
-        // MENSAJE OK
-        // =============================
-
-        showToast('✅ Archivo subido correctamente', 'success');
-
-        // =============================
-        // REINICIAR FORM
-        // =============================
-
-        document.getElementById('participationForm').reset();
-
-        document.getElementById('filePreview').innerHTML = '';
-        document.getElementById('filePreview').classList.add('d-none');
-
-        // =============================
-        // RECARGAR PAGINA
-        // =============================
+        showToast('Archivo subido correctamente', 'success');
 
         setTimeout(() => {
             location.reload();
         }, 1500);
 
-    } catch (error) {
+    } catch (err) {
 
-        console.error(error);
+        loadingToast.hide();
 
-        showToast('❌ Error al subir el archivo', 'error');
+        showToast('Error al subir archivo', 'error');
+
+        console.error(err);
     }
 }
 
